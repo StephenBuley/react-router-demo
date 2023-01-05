@@ -1,28 +1,34 @@
-import { Outlet, Link, useLoaderData, Form } from "react-router-dom"
-import {createContact, getContacts} from "../contacts"
+import {
+  Outlet,
+  redirect,
+  useLoaderData,
+  Form,
+  NavLink,
+} from "react-router-dom"
+import { createContact, getContacts } from "../contacts"
 
 export interface IContact {
-  id: string,
-  first: string,
-  last: string,
-  avatar: string,
-  twitter: string,
-  notes: string,
+  id: string
+  first: string
+  last: string
+  avatar: string
+  twitter: string
+  notes: string
   favorite: boolean
 }
 
 export async function action() {
   const contact = await createContact()
-  return {contact}
+  return redirect(`/contacts/${contact.id}/edit`)
 }
 
 export async function loader() {
   const contacts: IContact[] = await getContacts()
-  return {contacts}
+  return { contacts }
 }
 
 export default function Root() {
-  const {contacts} = useLoaderData() as {contacts: IContact[]}
+  const { contacts } = useLoaderData() as { contacts: IContact[] }
   return (
     <>
       <div id="sidebar">
@@ -48,20 +54,21 @@ export default function Root() {
             <ul>
               {contacts.map((contact) => (
                 <li key={contact.id}>
-                  <Link to={`contacts/${contact.id}`}>
+                  <NavLink to={`contacts/${contact.id}`}
+                    className={({isActive, isPending}) => isActive ? "active" : isPending ? "pending" : ""}>
                     {contact.first || contact.last ? (
                       <>
                         {contact.first} {contact.last}
                       </>
-                    ): (
+                    ) : (
                       <i>No Name</i>
                     )}{" "}
                     {contact.favorite && <span>★</span>}
-                  </Link>
+                  </NavLink>
                 </li>
               ))}
             </ul>
-          ): (
+          ) : (
             <p>
               <i>No contacts</i>
             </p>

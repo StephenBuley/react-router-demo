@@ -1,5 +1,13 @@
-import { Form, useLoaderData } from "react-router-dom";
-import { IContact } from "./root";
+import { Form, useLoaderData, redirect, Params } from "react-router-dom"
+import { IContact } from "./root"
+import { updateContact } from "../contacts"
+
+export async function action({request, params}: {request: Request,  params: Params}) {
+  const formData = await request.formData()
+  const updates = Object.fromEntries(formData)
+  await updateContact(params.contactId, updates)
+  return redirect(`/contacts/${params.contactId}`)
+}
 
 export default function EditContact() {
   const contact = useLoaderData() as IContact
@@ -44,16 +52,12 @@ export default function EditContact() {
       </label>
       <label>
         <span>Notes</span>
-        <textarea
-          name="notes"
-          defaultValue={contact.notes}
-          rows={6}
-        />
+        <textarea name="notes" defaultValue={contact.notes} rows={6} />
       </label>
       <p>
         <button type="submit">Save</button>
         <button type="button">Cancel</button>
       </p>
     </Form>
-  );
+  )
 }
