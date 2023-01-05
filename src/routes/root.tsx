@@ -5,8 +5,10 @@ import {
   Form,
   NavLink,
   useNavigation,
+  useSubmit,
 } from "react-router-dom"
 import { createContact, getContacts } from "../contacts"
+import { useEffect } from "react"
 
 export interface IContact {
   id: string
@@ -23,30 +25,56 @@ export async function action() {
   return redirect(`/contacts/${contact.id}/edit`)
 }
 
-export async function loader() {
-  const contacts: IContact[] = await getContacts()
-  return { contacts }
+export async function loader({ request }) {
+  const url = new URL(request.url)
+  const q = url.searchParams.get("q")
+  const contacts: IContact[] = await getContacts(q)
+  return { contacts, q }
 }
 
 export default function Root() {
-  const { contacts } = useLoaderData() as { contacts: IContact[] }
+  const { contacts, q } = useLoaderData() as {
+    contacts: IContact[]
+    q: string | null
+  }
   const navigation = useNavigation()
+  const submit = useSubmit()
+
+  const searching =
+    navigation.location &&
+    new URLSearchParams(navigation.location.search).has("q")
+
+  useEffect(() => {
+    const query = document.getElementById("q") as HTMLInputElement
+    if (query !== null) {
+      query.value = q || ""
+    }
+  }, [q])
+
   return (
     <>
       <div id="sidebar">
         <h1>React Router Contacts</h1>
         <div>
-          <form role="search" id="search-form">
+          <Form role="search" id="search-form">
             <input
               type="search"
               aria-label="search-contacts"
               id="q"
+              className={searching ? "loading" : ""}
               placeholder="search"
               name="q"
+              defaultValue={q ? q : ""}
+              onChange={(e) => {
+                const isFirstSearch = q == null
+                submit(e.currentTarget.form, {
+                  replace: !isFirstSearch
+                })
+              }}
             />
-            <div id="search-spinner" aria-hidden hidden={true}></div>
+            <div id="search-spinner" aria-hidden hidden={!searching}></div>
             <div className="sr-only" aria-live="polite"></div>
-          </form>
+          </Form>
           <Form method="post">
             <button type="submit">New</button>
           </Form>
