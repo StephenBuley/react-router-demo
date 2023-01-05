@@ -1,7 +1,7 @@
-import { Outlet, Link, useLoaderData } from "react-router-dom"
-import {getContacts} from "../contacts"
+import { Outlet, Link, useLoaderData, Form } from "react-router-dom"
+import {createContact, getContacts} from "../contacts"
 
-interface Contact {
+export interface IContact {
   id: string,
   first: string,
   last: string,
@@ -11,13 +11,18 @@ interface Contact {
   favorite: boolean
 }
 
+export async function action() {
+  const contact = await createContact()
+  return {contact}
+}
+
 export async function loader() {
-  const contacts: Contact[] = await getContacts()
+  const contacts: IContact[] = await getContacts()
   return {contacts}
 }
 
 export default function Root() {
-  const {contacts} = useLoaderData() as {contacts: Contact[]}
+  const {contacts} = useLoaderData() as {contacts: IContact[]}
   return (
     <>
       <div id="sidebar">
@@ -34,9 +39,9 @@ export default function Root() {
             <div id="search-spinner" aria-hidden hidden={true}></div>
             <div className="sr-only" aria-live="polite"></div>
           </form>
-          <form method="post">
+          <Form method="post">
             <button type="submit">New</button>
-          </form>
+          </Form>
         </div>
         <nav>
           {contacts.length ? (
