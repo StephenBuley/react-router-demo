@@ -3,7 +3,14 @@ import { getContact, updateContact } from "../contacts"
 import { IContact } from "./root"
 
 export async function loader({ params }) {
-  return getContact(params.contactId)
+  const contact = getContact(params.contactId)
+  if (!contact) {
+    throw new Response("", {
+      status: 404,
+      statusText: "Not Found"
+    })
+  }
+  return contact
 }
 
 export async function action({request, params}) {
@@ -73,6 +80,9 @@ function Favorite({
   // yes, this is a `let` for later
   const fetcher = useFetcher()
   let favorite = contact.favorite
+  if (fetcher.formData) {
+    favorite = fetcher.formData.get("favorite") === "true"
+  }
   return (
     <fetcher.Form method="post">
       <button
