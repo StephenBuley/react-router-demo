@@ -1,6 +1,13 @@
-import { Outlet } from 'react-router-dom'
+import { Link, Outlet, useLoaderData } from 'react-router-dom'
+import { ContactType } from './contact'
+
+type LoaderResponseType = {
+  contacts: ContactType[]
+}
 
 export default function Root() {
+  const { contacts } = useLoaderData() as LoaderResponseType
+
   return (
     <>
       <div id="sidebar">
@@ -22,14 +29,28 @@ export default function Root() {
           </form>
         </div>
         <nav>
-          <ul>
-            <li>
-              <a href={`/contacts/1`}>Your Name</a>
-            </li>
-            <li>
-              <a href={`/contacts/2`}>Your Friend</a>
-            </li>
-          </ul>
+          {contacts.length ? (
+            <ul>
+              {contacts.map((contact) => (
+                <li key={contact.id as React.Key}>
+                  <Link to={`contacts/${contact.id}`}>
+                    {contact.first || contact.last ? (
+                      <>
+                        {contact.first} {contact.last}
+                      </>
+                    ) : (
+                      <i>No Name</i>
+                    )}{' '}
+                    {contact.favorite && <span>★</span>}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p>
+              <i>No contacts</i>
+            </p>
+          )}
         </nav>
       </div>
       <div id="detail">

@@ -1,6 +1,7 @@
 import { Form } from 'react-router-dom'
 
-type ContactType = {
+export type ContactType = {
+  id: string
   first: string
   last: string
   avatar: string
@@ -11,6 +12,7 @@ type ContactType = {
 
 export default function Contact() {
   const contact: ContactType = {
+    id: 'asjdkfjskdjfkajsdfl',
     first: 'Your',
     last: 'Name',
     avatar: 'https://placekitten.com/g/200/200',
