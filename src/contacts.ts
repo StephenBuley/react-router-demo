@@ -8,7 +8,7 @@ type Contact = {
   createdAt: number
 }
 
-export async function getContacts(query?: string) {
+export async function getContacts(query?: string | null) {
   await fakeNetwork(`getContacts:${query}`)
   let contacts = await localforage.getItem<Contact[]>('contacts')
   if (!contacts) contacts = []
@@ -38,7 +38,7 @@ export async function getContact(id: string) {
 
 export async function updateContact(
   id: string,
-  updates: Record<string, string>,
+  updates: Record<string, string | boolean>,
 ) {
   await fakeNetwork()
   const contacts = await localforage.getItem<Contact[]>('contacts')

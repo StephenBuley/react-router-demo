@@ -1,4 +1,4 @@
-import { Form, useLoaderData } from 'react-router-dom'
+import { Form, useFetcher, useLoaderData } from 'react-router-dom'
 
 export type ContactType = {
   id: string
@@ -67,11 +67,15 @@ export default function Contact() {
 }
 
 function Favorite({ contact }: { contact: ContactType }) {
+  const fetcher = useFetcher()
   // yes, this is a `let` for later
   // eslint-disable-next-line prefer-const
   let favorite = contact.favorite
+  if (fetcher.formData) {
+    favorite = fetcher.formData.get('favorite') === 'true'
+  }
   return (
-    <Form method="post">
+    <fetcher.Form method="post">
       <button
         name="favorite"
         value={favorite ? 'false' : 'true'}
@@ -79,6 +83,6 @@ function Favorite({ contact }: { contact: ContactType }) {
       >
         {favorite ? '★' : '☆'}
       </button>
-    </Form>
+    </fetcher.Form>
   )
 }

@@ -4,33 +4,54 @@ import {
   Form,
   NavLink,
   useNavigation,
+  useSubmit,
 } from 'react-router-dom'
 import { ContactType } from '../contact/contact'
+import { useEffect } from 'react'
 
 type LoaderResponseType = {
   contacts: ContactType[]
+  q: string
 }
 
 export default function Root() {
-  const { contacts } = useLoaderData() as LoaderResponseType
+  const { contacts, q } = useLoaderData() as LoaderResponseType
   const navigation = useNavigation() //Navigation.state === "idle, loading, submitting"
+  const submit = useSubmit()
+
+  const searching =
+    navigation.location &&
+    new URLSearchParams(navigation.location.search).has('q')
+
+  useEffect(() => {
+    const el = document.getElementById('q')! as HTMLInputElement
+    el.value = q
+  }, [q])
 
   return (
     <>
       <div id="sidebar">
         <h1>React Router Contacts</h1>
         <div>
-          <form id="search-form" role="search">
+          <Form id="search-form" role="search">
             <input
               id="q"
               aria-label="Search contacts"
               placeholder="Search"
               type="search"
               name="q"
+              defaultValue={q}
+              onChange={(e) => {
+                const isFirstSearch = q == null
+                submit(e.currentTarget.form, {
+                  replace: !isFirstSearch,
+                })
+              }}
+              className={searching ? 'loading' : ''}
             />
-            <div id="search-spinner" aria-hidden hidden={true} />
+            <div id="search-spinner" aria-hidden hidden={!searching} />
             <div className="sr-only" aria-live="polite"></div>
-          </form>
+          </Form>
           <Form method="post">
             <button type="submit">New</button>
           </Form>
