@@ -20,6 +20,9 @@ export async function action({
   params: Params<string>
 }) {
   const formData = await request.formData()
+  for (const [name, value] of formData.entries()) {
+    console.log(name, value)
+  }
   return updateContact(params.contactId!, {
     favorite: formData.get('favorite') === 'true',
   })
